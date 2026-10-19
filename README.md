@@ -1,4 +1,4 @@
-# Kumo Mo · 雲朵湊一湊 ☁️
+# Kumo · 雲朵湊一湊 ☁️
 
 A cute Japanese-style web game for kindergarten kids to master **number pairs that make 8 and 9** — zero props, pure screen play. Perfect for classroom projection, online lessons, or tablets.
 
@@ -27,4 +27,4 @@ Classroom chant built in: 先看總數、再找朋友 *(look at the target first
 
 ## Tech
 
-HTML5 · CSS3 · Vanilla JS (ES6) · WebAudio API · Google Fonts (Dela Gothic One, M PLUS Rounded 1c, Noto Sans TC)
+HTML5 · CSS3 · Vanilla JS (ES6) · WebAudio API · Google Fonts (Huninn, M PLUS Rounded 1c, Noto Sans TC)
