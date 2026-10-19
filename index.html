@@ -10,7 +10,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --font-head:'Huninn','M PLUS Rounded 1c','Noto Sans TC',sans-serif;
+  --font-head:'M PLUS Rounded 1c','Huninn','Noto Sans TC',sans-serif;
   --font-body:'M PLUS Rounded 1c','Huninn','Noto Sans TC',sans-serif;
 }
 [data-theme="white"]{
@@ -43,7 +43,9 @@ body{
   background:linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 55%,var(--bg3) 100%);
   min-height:100vh; overflow-x:hidden; user-select:none; -webkit-user-select:none;
 }
-h1,h2,.dela{font-family:var(--font-head); font-weight:400; letter-spacing:.02em}
+h1,h2,.dela{font-family:var(--font-head); font-weight:800; letter-spacing:.02em}
+.target,.eq,.obtn,.cloud .num{font-weight:800}
+.btn,.mode .t,.seg2 button{font-weight:700}
 
 /* ---------- background deco ---------- */
 .deco{position:fixed; pointer-events:none; z-index:0; opacity:.55}
@@ -127,35 +129,31 @@ h1,h2,.dela{font-family:var(--font-head); font-weight:400; letter-spacing:.02em}
 .field{display:flex; flex-wrap:wrap; justify-content:center; gap:clamp(10px,2.5vw,26px);
   padding:26px 6px 10px; max-width:900px; margin:0 auto}
 
-/* ---------- cloud : simple kawaii blob, white frame ---------- */
+/* ---------- cloud : fluffy silhouette, white frame, no face ---------- */
 .cloud{position:relative; border:none; cursor:pointer; font-family:var(--font-body);
-  width:clamp(128px,18vw,188px); aspect-ratio:1.32; background:var(--cloud);
-  border-radius:46% 54% 52% 48% / 60% 62% 38% 40%;
-  box-shadow:0 0 0 7px #ffffff, 0 14px 28px rgba(150,170,210,.28);
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
-  transition:transform .15s, box-shadow .15s;
+  width:clamp(128px,18vw,188px); aspect-ratio:1.5; background:var(--cloud);
+  border-radius:999px;
+  display:flex; align-items:center; justify-content:center;
+  filter:drop-shadow(0 5px 0 #ffffff) drop-shadow(0 -5px 0 #ffffff) drop-shadow(5px 0 0 #ffffff) drop-shadow(-5px 0 0 #ffffff) drop-shadow(0 14px 14px rgba(150,170,210,.22));
+  transition:transform .15s;
   animation:floaty var(--d,3.4s) ease-in-out infinite}
-.cloud .kface{position:relative; display:flex; justify-content:center; gap:15px}
-.cloud .kface i{width:9px; height:12px; background:#55556A; border-radius:50%}
-.cloud .kface u{position:absolute; top:15px; left:50%; transform:translateX(-50%); width:17px; height:9px;
-  border:3px solid #55556A; border-top:none; border-left:none; border-right:none;
-  border-radius:0 0 14px 14px; text-decoration:none}
-.cloud .kface .blush{position:absolute; top:5px; width:13px; height:8px; background:#FFB3C6; border-radius:50%; opacity:.9}
-.cloud .kface .blush.l{left:-17px}.cloud .kface .blush.r{right:-17px}
-.cloud .num{font-family:var(--font-head); font-size:clamp(2.7rem,6.8vw,3.9rem); line-height:1.1; color:#45455A}
+.cloud::before,.cloud::after{content:''; position:absolute; background:var(--cloud); border-radius:50%}
+.cloud::before{width:52%; aspect-ratio:1; top:-36%; left:13%}
+.cloud::after{width:38%; aspect-ratio:1; top:-24%; right:13%}
+.cloud .num{position:relative; z-index:2; font-family:var(--font-head); font-weight:800;
+  font-size:clamp(3rem,7.5vw,4.2rem); line-height:1; color:#45455A}
 @keyframes floaty{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-14px) rotate(1deg)}}
 .cloud.sel{transform:scale(1.12);
-  box-shadow:0 0 0 7px #ffffff, 0 0 0 14px var(--gold), 0 14px 28px rgba(150,170,210,.3)}
+  filter:drop-shadow(0 5px 0 #ffffff) drop-shadow(0 -5px 0 #ffffff) drop-shadow(5px 0 0 #ffffff) drop-shadow(-5px 0 0 #ffffff) drop-shadow(0 11px 0 var(--gold)) drop-shadow(0 -11px 0 var(--gold)) drop-shadow(11px 0 0 var(--gold)) drop-shadow(-11px 0 0 var(--gold)) drop-shadow(0 14px 14px rgba(150,170,210,.25))}
 .cloud.good{animation:pop .55s ease;
-  box-shadow:0 0 0 7px #ffffff, 0 0 0 14px var(--good), 0 14px 28px rgba(150,170,210,.3)}
+  filter:drop-shadow(0 5px 0 #ffffff) drop-shadow(0 -5px 0 #ffffff) drop-shadow(5px 0 0 #ffffff) drop-shadow(-5px 0 0 #ffffff) drop-shadow(0 11px 0 var(--good)) drop-shadow(0 -11px 0 var(--good)) drop-shadow(11px 0 0 var(--good)) drop-shadow(-11px 0 0 var(--good)) drop-shadow(0 14px 14px rgba(150,170,210,.25))}
 .cloud.bad{animation:shake .5s ease;
-  box-shadow:0 0 0 7px #ffffff, 0 0 0 14px var(--bad), 0 14px 28px rgba(150,170,210,.3)}
+  filter:drop-shadow(0 5px 0 #ffffff) drop-shadow(0 -5px 0 #ffffff) drop-shadow(5px 0 0 #ffffff) drop-shadow(-5px 0 0 #ffffff) drop-shadow(0 11px 0 var(--bad)) drop-shadow(0 -11px 0 var(--bad)) drop-shadow(11px 0 0 var(--bad)) drop-shadow(-11px 0 0 var(--bad)) drop-shadow(0 14px 14px rgba(150,170,210,.25))}
 .cloud.bomb{background:#6B6B8A;
-  box-shadow:0 0 0 7px #ffffff, 0 14px 28px rgba(0,0,0,.28)}
+  filter:drop-shadow(0 5px 0 #ffffff) drop-shadow(0 -5px 0 #ffffff) drop-shadow(5px 0 0 #ffffff) drop-shadow(-5px 0 0 #ffffff) drop-shadow(0 14px 14px rgba(0,0,0,.28))}
+.cloud.bomb::before,.cloud.bomb::after{background:#6B6B8A}
 .cloud.bomb .num{color:#fff}
-.cloud.bomb .kface i{background:#2E2E44}
-.cloud.bomb .kface u{border-color:#2E2E44; top:13px; width:15px; border-radius:0}
-.cloud.bomb .fuse{position:absolute; top:-24px; left:50%; width:6px; height:30px; background:#8A6B4A;
+.cloud.bomb .fuse{position:absolute; z-index:2; top:-38%; left:50%; width:6px; height:32%; background:#8A6B4A;
   border-radius:4px; transform:translateX(-50%) rotate(12deg)}
 .cloud.bomb .fuse::after{content:'✦'; position:absolute; top:-20px; left:50%; transform:translateX(-50%);
   color:var(--gold); font-size:1.3rem; animation:spark .3s ease-in-out infinite alternate}
@@ -398,7 +396,6 @@ function burstAt(el){
 }
 function cloudHTML(n, extra=''){
   return `<button class="cloud ${extra}" data-n="${n}" style="--d:${(2.6+Math.random()*2).toFixed(2)}s">
-    <span class="kface"><i></i><i></i><span class="blush l"></span><span class="blush r"></span><u></u></span>
     <span class="num">${n}</span></button>`;
 }
 function lock(ms){ S.busy=true; setTimeout(()=>S.busy=false, ms); }
@@ -468,7 +465,6 @@ function renderClouds(nums, withBombs){
     tmp.innerHTML = it.bomb
       ? `<button class="cloud bomb" data-bomb="1" style="--d:${(2.6+Math.random()*2).toFixed(2)}s">
            <span class="fuse"></span>
-           <span class="kface"><i></i><i></i><u></u></span>
            <span class="num">💣</span></button>`
       : cloudHTML(it.n);
     f.appendChild(tmp.firstChild);
@@ -561,8 +557,8 @@ function speedRound(){
   say(T().canQ(speedTarget));
   $('gameArea').innerHTML=`
     <div class="bigpair">
-      <div class="cloud" style="--d:2.4s"><span class="kface"><i></i><i></i><span class="blush l"></span><span class="blush r"></span><u></u></span><span class="num">${speedA}</span></div>
-      <div class="cloud" style="--d:3s"><span class="kface"><i></i><i></i><span class="blush l"></span><span class="blush r"></span><u></u></span><span class="num">${speedB}</span></div>
+      <div class="cloud" style="--d:2.4s"><span class="num">${speedA}</span></div>
+      <div class="cloud" style="--d:3s"><span class="num">${speedB}</span></div>
     </div>
     <div class="tbar"><i id="tbarFill"></i></div>
     <div class="tlabel" id="tLabel"></div>
