@@ -413,6 +413,7 @@ function applySettings(){
   $('soundBtn').textContent = S.sound? '🔊':'🔇';
   $('langBtn').querySelector('span').textContent = S.lang==='zh'?'繁中':'EN';
   document.documentElement.lang = S.lang==='zh'?'zh-Hant':'en';
+  document.querySelectorAll('#bombTarget button').forEach(b=>{ b.textContent = T().targetIs(+b.dataset.tg); });
   renderHome();
   if(S.mode){ enterMode(S.mode, true); }
 }
