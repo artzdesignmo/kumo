@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kumo Mo · 雲朵湊一湊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --font-head:'Dela Gothic One','M PLUS Rounded 1c','Noto Sans TC',sans-serif;
+  --font-body:'M PLUS Rounded 1c','Noto Sans TC',sans-serif;
+}
+[data-theme="white"]{
+  --bg1:#FFFDF8; --bg2:#FFEAF3; --bg3:#E3F2FF;
+  --ink:#4A4A5A; --ink-soft:#8A8A99;
+  --card:#FFFFFF; --card-shadow:0 10px 30px rgba(255,150,180,.18);
+  --cloud:#FFFFFF; --cloud-edge:#FFE3EE;
+  --accent:#FF8FB2; --accent2:#7FC8F8; --gold:#FFC93C; --good:#7ED492; --bad:#FF7B7B;
+  --bubble:#FFFFFF; --sun:#FFD93D;
+}
+[data-theme="silver"]{
+  --bg1:#F7F8FA; --bg2:#E9EDF5; --bg3:#FDEDF3;
+  --ink:#454552; --ink-soft:#9A9AA8;
+  --card:#FFFFFF; --card-shadow:0 10px 30px rgba(120,140,180,.16);
+  --cloud:#FFFFFF; --cloud-edge:#E4E9F5;
+  --accent:#FF8FB2; --accent2:#7FC8F8; --gold:#FFC93C; --good:#7ED492; --bad:#FF7B7B;
+  --bubble:#FFFFFF; --sun:#FFD93D;
+}
+[data-theme="black"]{
+  --bg1:#191930; --bg2:#232344; --bg3:#2E2A55;
+  --ink:#F2F0FF; --ink-soft:#A9A7C9;
+  --card:#2A2A48; --card-shadow:0 10px 30px rgba(0,0,0,.4);
+  --cloud:#EDEBFF; --cloud-edge:#C9C4F2;
+  --accent:#FF9DBE; --accent2:#8FD4FF; --gold:#FFD93D; --good:#8FE3A8; --bad:#FF8F8F;
+  --bubble:#2A2A48; --sun:#FFE98A;
+}
+html,body{height:100%}
+body{
+  font-family:var(--font-body); color:var(--ink);
+  background:linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 55%,var(--bg3) 100%);
+  min-height:100vh; overflow-x:hidden; user-select:none; -webkit-user-select:none;
+}
+h1,h2,.dela{font-family:var(--font-head); font-weight:400; letter-spacing:.02em}
+
+/* ---------- background deco ---------- */
+.deco{position:fixed; pointer-events:none; z-index:0; opacity:.55}
+.sun{top:26px; left:30px; width:92px; height:92px; background:var(--sun); border-radius:50%;
+  box-shadow:0 0 40px 12px color-mix(in srgb, var(--sun) 45%, transparent); animation:sunpulse 4s ease-in-out infinite}
+.sun::before,.sun::after{content:''; position:absolute; inset:-16px; border-radius:50%;
+  border:5px dashed color-mix(in srgb, var(--sun) 70%, transparent); animation:spin 24s linear infinite}
+.sun::after{inset:-30px; opacity:.35; animation-duration:40s; animation-direction:reverse}
+.sun .sface{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:8px}
+.sun .sface i{width:9px; height:12px; background:#5A4A3A; border-radius:50%}
+.sun .sface u{position:absolute; width:26px; height:14px; border:4px solid #5A4A3A; border-top:none; border-left:none; border-right:none; border-radius:0 0 20px 20px; bottom:26px; text-decoration:none}
+@keyframes sunpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.minicloud{position:fixed; z-index:0; pointer-events:none; opacity:.5; background:var(--cloud);
+  border-radius:999px; animation:drift linear infinite}
+.minicloud::before,.minicloud::after{content:''; position:absolute; background:var(--cloud); border-radius:50%}
+.minicloud::before{width:55%; height:160%; top:-80%; left:12%}
+.minicloud::after{width:40%; height:110%; top:-55%; right:12%}
+@keyframes drift{from{transform:translateX(-15vw)}to{transform:translateX(115vw)}}
+.stars{display:none}
+[data-theme="black"] .stars{display:block; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:radial-gradient(2px 2px at 20% 15%, #fff 50%, transparent 51%),radial-gradient(2px 2px at 70% 8%, #fff 50%, transparent 51%),radial-gradient(1.5px 1.5px at 40% 30%, #fff 50%, transparent 51%),radial-gradient(2px 2px at 85% 35%, #fff 50%, transparent 51%),radial-gradient(1.5px 1.5px at 10% 45%, #fff 50%, transparent 51%),radial-gradient(2px 2px at 55% 55%, #fff 50%, transparent 51%),radial-gradient(1.5px 1.5px at 30% 65%, #fff 50%, transparent 51%),radial-gradient(2px 2px at 90% 60%, #fff 50%, transparent 51%)}
+[data-theme="black"] .sun{opacity:.9}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky; top:0; z-index:20; display:flex; align-items:center; justify-content:space-between;
+  padding:12px 18px; backdrop-filter:blur(8px); background:color-mix(in srgb, var(--bg1) 72%, transparent)}
+.brand{display:flex; align-items:center; gap:10px; font-size:1.05rem}
+.brand .logo{width:38px; height:30px; background:var(--cloud); border-radius:999px; position:relative; box-shadow:0 3px 8px rgba(0,0,0,.08)}
+.brand .logo::before,.brand .logo::after{content:''; position:absolute; background:var(--cloud); border-radius:50%}
+.brand .logo::before{width:18px; height:18px; top:-9px; left:7px}
+.brand .logo::after{width:13px; height:13px; top:-6px; right:7px}
+.controls{display:flex; gap:8px; align-items:center}
+.ctl{border:none; cursor:pointer; font-family:var(--font-body); font-weight:700; font-size:.85rem;
+  background:var(--card); color:var(--ink); border-radius:999px; padding:9px 14px; box-shadow:var(--card-shadow);
+  display:flex; align-items:center; gap:6px; transition:transform .12s}
+.ctl:active{transform:scale(.93)}
+.ctl .dots{display:flex; gap:4px}
+.ctl .dots i{width:12px; height:12px; border-radius:50%; border:1.5px solid var(--ink-soft)}
+.ctl .dots i.on{background:var(--ink); border-color:var(--ink)}
+
+/* ---------- layout ---------- */
+.wrap{position:relative; z-index:1; max-width:1060px; margin:0 auto; padding:10px 18px 60px}
+
+/* ---------- home ---------- */
+.hero{text-align:center; padding:26px 10px 8px}
+.hero h1{font-size:clamp(2.2rem,6vw,3.6rem); color:var(--ink); text-shadow:0 3px 0 color-mix(in srgb, var(--accent) 30%, transparent)}
+.hero h1 .jp{color:var(--accent)}
+.hero p{margin-top:10px; font-size:clamp(1rem,2.6vw,1.25rem); color:var(--ink-soft); font-weight:700}
+.modes{display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:16px; margin-top:26px}
+.mode{border:none; cursor:pointer; text-align:left; background:var(--card); border-radius:26px; padding:22px;
+  box-shadow:var(--card-shadow); display:flex; gap:16px; align-items:center; transition:transform .15s; color:var(--ink);
+  font-family:var(--font-body)}
+.mode:hover{transform:translateY(-4px) scale(1.015)}
+.mode:active{transform:scale(.97)}
+.mode .ic{font-size:2.6rem; flex:0 0 auto; filter:drop-shadow(0 4px 6px rgba(0,0,0,.12))}
+.mode .t{font-family:var(--font-head); font-size:1.25rem; margin-bottom:6px}
+.mode .d{font-size:.92rem; color:var(--ink-soft); font-weight:500; line-height:1.5}
+.mode .go{margin-left:auto; font-size:1.6rem; color:var(--accent); flex:0 0 auto}
+.tip{margin:30px auto 0; max-width:640px; background:var(--bubble); border:3px dashed var(--accent);
+  border-radius:20px; padding:16px 20px; text-align:center; font-weight:700; font-size:1.02rem; box-shadow:var(--card-shadow)}
+.tip small{display:block; margin-top:6px; color:var(--ink-soft); font-weight:500}
+.foot{margin-top:26px; text-align:center; color:var(--ink-soft); font-size:.85rem}
+
+/* ---------- game screen ---------- */
+#stage{display:none}
+.hud{display:flex; align-items:center; gap:12px; margin:8px 0 4px; flex-wrap:wrap}
+.back{border:none; cursor:pointer; background:var(--card); color:var(--ink); font-family:var(--font-body);
+  font-weight:800; font-size:1rem; border-radius:999px; padding:10px 18px; box-shadow:var(--card-shadow)}
+.back:active{transform:scale(.93)}
+.target{margin:0 auto; font-family:var(--font-head); font-size:clamp(1.5rem,4.5vw,2.4rem);
+  background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; border-radius:999px;
+  padding:10px 34px; box-shadow:0 6px 18px color-mix(in srgb, var(--accent) 45%, transparent)}
+.scorebox{display:flex; gap:10px; align-items:center; font-weight:800; font-size:1.05rem}
+.scorebox .pill{background:var(--card); border-radius:999px; padding:9px 16px; box-shadow:var(--card-shadow)}
+.say{margin:14px auto; max-width:720px; background:var(--bubble); border-radius:22px; padding:18px 24px;
+  font-size:clamp(1.15rem,3.4vw,1.6rem); font-weight:800; text-align:center; position:relative;
+  box-shadow:var(--card-shadow); min-height:76px; display:flex; align-items:center; justify-content:center}
+.say::after{content:''; position:absolute; bottom:-12px; left:50%; transform:translateX(-50%);
+  border:12px solid transparent; border-top-color:var(--bubble); border-bottom:none}
+.say.good{outline:4px solid var(--good)}
+.say.bad{outline:4px solid var(--bad)}
+.field{display:flex; flex-wrap:wrap; justify-content:center; gap:clamp(10px,2.5vw,26px);
+  padding:26px 6px 10px; max-width:900px; margin:0 auto}
+
+/* ---------- cloud ---------- */
+.cloud{position:relative; border:none; cursor:pointer; font-family:var(--font-body);
+  width:clamp(118px,17vw,182px); aspect-ratio:1.55; background:var(--cloud);
+  border-radius:999px; box-shadow:0 8px 20px rgba(140,160,200,.25), inset -6px -8px 0 var(--cloud-edge);
+  transition:transform .15s, box-shadow .15s, outline .15s; outline:4px solid transparent;
+  animation:floaty var(--d,3.4s) ease-in-out infinite; color:var(--ink)}
+.cloud::before,.cloud::after{content:''; position:absolute; background:var(--cloud); border-radius:50%;
+  box-shadow:inset -4px -5px 0 var(--cloud-edge)}
+.cloud::before{width:52%; aspect-ratio:1; top:-38%; left:14%}
+.cloud::after{width:38%; aspect-ratio:1; top:-26%; right:14%}
+.cloud .num{position:relative; z-index:2; font-family:var(--font-head); font-size:clamp(2.4rem,6vw,3.6rem); line-height:1}
+.cloud .kface{position:absolute; z-index:2; top:16%; left:0; right:0; display:flex; justify-content:center; gap:26%}
+.cloud .kface i{width:11px; height:15px; background:#4A4A5A; border-radius:50%; position:relative}
+.cloud .kface i::after{content:''; position:absolute; width:4px; height:4px; background:#fff; border-radius:50%; top:3px; left:2px}
+.cloud .kface u{position:absolute; top:22px; left:50%; transform:translateX(-50%); width:22px; height:12px;
+  border:3.5px solid #4A4A5A; border-top:none; border-left:none; border-right:none; border-radius:0 0 18px 18px; text-decoration:none}
+.cloud .kface .blush{position:absolute; top:14px; width:16px; height:10px; background:#FFB3C6; border-radius:50%; opacity:.85}
+.cloud .kface .blush.l{left:16%}.cloud .kface .blush.r{right:16%}
+[data-theme="black"] .cloud .kface i{background:#3A3A52}
+[data-theme="black"] .cloud .kface u{border-color:#3A3A52}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-14px) rotate(1deg)}}
+.cloud.sel{outline-color:var(--gold); transform:scale(1.14); z-index:3;
+  box-shadow:0 0 0 6px color-mix(in srgb, var(--gold) 35%, transparent), 0 12px 26px rgba(140,160,200,.35)}
+.cloud.good{outline-color:var(--good); animation:pop .55s ease}
+.cloud.bad{outline-color:var(--bad); animation:shake .5s ease}
+.cloud.bomb{background:#6B6B8A; box-shadow:0 8px 20px rgba(0,0,0,.3), inset -6px -8px 0 #54546E}
+.cloud.bomb::before,.cloud.bomb::after{background:#6B6B8A; box-shadow:inset -4px -5px 0 #54546E}
+.cloud.bomb .num{color:#fff}
+.cloud.bomb .fuse{position:absolute; z-index:2; top:-30%; left:50%; width:6px; height:34%; background:#8A6B4A;
+  border-radius:4px; transform:translateX(-50%) rotate(12deg)}
+.cloud.bomb .fuse::after{content:'✦'; position:absolute; top:-22px; left:50%; transform:translateX(-50%);
+  color:var(--gold); font-size:1.4rem; animation:spark .3s ease-in-out infinite alternate}
+@keyframes spark{from{transform:translateX(-50%) scale(1) rotate(0)}to{transform:translateX(-50%) scale(1.5) rotate(25deg)}}
+.cloud.boomed{animation:boom .6s ease forwards}
+@keyframes boom{0%{transform:scale(1)}30%{transform:scale(1.35) rotate(-6deg)}100%{transform:scale(.4) rotate(10deg); opacity:.35}}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.3)}100%{transform:scale(1.1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(12px)}60%{transform:translateX(-8px)}80%{transform:translateX(8px)}}
+
+/* sparkles */
+.spark{position:fixed; z-index:50; pointer-events:none; font-size:1.6rem; animation:sparkfly .9s ease-out forwards}
+@keyframes sparkfly{from{transform:translate(0,0) scale(1); opacity:1}to{transform:translate(var(--sx),var(--sy)) scale(.3); opacity:0}}
+
+/* ---------- speed mode ---------- */
+.bigpair{display:flex; justify-content:center; gap:clamp(16px,5vw,60px); margin:10px 0 4px; flex-wrap:wrap}
+.bigpair .cloud{width:clamp(150px,26vw,230px); cursor:default; animation-duration:2.6s}
+.oxrow{display:flex; justify-content:center; gap:clamp(18px,6vw,60px); margin-top:18px}
+.obtn{border:none; cursor:pointer; width:clamp(96px,18vw,140px); aspect-ratio:1; border-radius:50%;
+  font-family:var(--font-head); font-size:clamp(2rem,7vw,3.2rem); color:#fff;
+  box-shadow:0 10px 24px rgba(0,0,0,.18); transition:transform .12s}
+.obtn:active{transform:scale(.9)}
+.obtn.yes{background:linear-gradient(135deg,#8FE3A8,#5BC47E)}
+.obtn.no{background:linear-gradient(135deg,#FF9D9D,#F86B6B)}
+.tbar{height:16px; background:color-mix(in srgb, var(--ink) 12%, transparent); border-radius:999px; overflow:hidden; margin:16px auto 0; max-width:640px}
+.tbar i{display:block; height:100%; width:100%; border-radius:999px;
+  background:linear-gradient(90deg,var(--accent2),var(--accent)); transition:width 1s linear}
+.tlabel{text-align:center; font-weight:800; font-size:1.15rem; margin-top:8px}
+
+/* ---------- fill mode ---------- */
+.eq{text-align:center; font-family:var(--font-head); font-size:clamp(2.2rem,8vw,4rem); margin:18px 0 6px}
+.eq .blank{display:inline-block; min-width:1.6em; border-bottom:8px dashed var(--accent); color:var(--accent); padding:0 .15em}
+
+/* ---------- overlay ---------- */
+.ovl{position:fixed; inset:0; z-index:60; display:none; align-items:center; justify-content:center;
+  background:color-mix(in srgb, var(--bg1) 55%, transparent); backdrop-filter:blur(6px); padding:20px}
+.ovl.show{display:flex}
+.ovl-card{background:var(--card); border-radius:30px; padding:38px 44px; text-align:center; max-width:440px;
+  box-shadow:var(--card-shadow); animation:ovin .35s ease}
+@keyframes ovin{from{transform:scale(.7); opacity:0}to{transform:scale(1); opacity:1}}
+.ovl-card h2{font-size:2rem; margin-bottom:8px}
+.ovl-card .stars{font-size:2.6rem; letter-spacing:.2em; margin:10px 0}
+.ovl-card p{font-weight:700; color:var(--ink-soft); margin-bottom:20px; font-size:1.05rem}
+.btn{border:none; cursor:pointer; font-family:var(--font-head); font-size:1.2rem; color:#fff;
+  background:linear-gradient(135deg,var(--accent),var(--accent2)); border-radius:999px; padding:14px 40px;
+  box-shadow:0 8px 20px color-mix(in srgb, var(--accent) 45%, transparent)}
+.btn:active{transform:scale(.94)}
+.seg2{display:flex; gap:10px; justify-content:center; margin:6px 0 2px}
+.seg2 button{border:3px solid transparent; cursor:pointer; font-family:var(--font-head); font-size:1.15rem;
+  background:var(--card); color:var(--ink); border-radius:999px; padding:8px 26px; box-shadow:var(--card-shadow)}
+.seg2 button.on{border-color:var(--accent); color:var(--accent)}
+
+.shake-screen{animation:ssshake .5s ease}
+@keyframes ssshake{0%,100%{transform:translate(0)}20%{transform:translate(-10px,4px)}40%{transform:translate(9px,-5px)}60%{transform:translate(-7px,-4px)}80%{transform:translate(6px,5px)}}
+
+@media (max-width:640px){
+  .field{gap:12px}
+  .say{min-height:64px}
+  .sun{width:64px; height:64px; top:14px; left:14px}
+}
+</style>
+</head>
+<body data-theme="silver">
+<div class="stars"></div>
+<div class="sun"><div class="sface"><i></i><i></i><u></u></div></div>
+
+<header class="topbar">
+  <div class="brand"><span class="logo"></span><span class="dela" id="brandName">Kumo Mo</span></div>
+  <div class="controls">
+    <button class="ctl" id="langBtn" aria-label="language">🌐 <span>繁中</span></button>
+    <button class="ctl" id="themeBtn" aria-label="theme"><span class="dots"><i data-t="white"></i><i data-t="silver" class="on"></i><i data-t="black"></i></span></button>
+    <button class="ctl" id="soundBtn" aria-label="sound">🔊</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- HOME -->
+  <section id="home">
+    <div class="hero">
+      <h1><span class="jp">くも</span> 雲朵湊一湊</h1>
+      <p id="heroSub">和可愛雲朵一起學會 8 和 9 的組合！</p>
+    </div>
+    <div class="modes" id="modeList"></div>
+    <div class="tip" id="homeTip">💡 <span id="tipText">口訣：先看總數、再找朋友</span><small id="tipSub">老師投屏一點即玩 · 全班一起喊口令更有趣！</small></div>
+    <div class="foot">Kumo Mo · made with ♥ for little learners</div>
+  </section>
+
+  <!-- GAME -->
+  <section id="stage">
+    <div class="hud">
+      <button class="back" id="backBtn">← <span id="backTxt">返回</span></button>
+      <div class="target" id="targetBanner">湊成 8</div>
+      <div class="scorebox">
+        <span class="pill">⭐ <span id="scoreV">0</span></span>
+        <span class="pill">🔥 <span id="streakV">0</span></span>
+      </div>
+    </div>
+    <div class="seg2" id="bombTarget" style="display:none">
+      <button data-tg="8" class="on">湊成 8</button>
+      <button data-tg="9">湊成 9</button>
+    </div>
+    <div class="say" id="sayBox"><span id="sayTxt">點兩朵雲朵試試看！</span></div>
+    <div id="gameArea"></div>
+  </section>
+</div>
+
+<div class="ovl" id="ovl"><div class="ovl-card" id="ovlCard"></div></div>
+
+<script>
+'use strict';
+/* ================= i18n ================= */
+const I18N = {
+  zh: {
+    heroSub: '和可愛雲朵一起學會 8 和 9 的組合！',
+    tip: '口訣：先看總數、再找朋友', tipSub: '老師投屏一點即玩 · 全班一起喊口令更有趣！',
+    back: '返回',
+    modes: [
+      {icon:'☁️', t:'湊成 8', d:'點兩朵雲朵，加起來剛好是 8 嗎？全班一起喊：對對對！'},
+      {icon:'🌈', t:'湊成 9', d:'換個目標！點兩朵雲朵，加起來剛好是 9 嗎？'},
+      {icon:'⚡', t:'極速挑戰', d:'60 秒限時！看兩朵雲朵能不能湊成目標數，馬上按 ⭕ 或 ❌！'},
+      {icon:'🧩', t:'缺雲朵填空', d:'2 +（ ）= 8，哪一朵雲朵不見了？快幫它回家！'},
+      {icon:'💣', t:'炸彈陷阱', d:'小心炸彈雲！避開炸彈，找出能湊成目標數的好朋友。'}
+    ],
+    pick2: '點兩朵雲朵試試看！',
+    good: (a,b,t)=>`對對對！${a} 和 ${b} 湊成 ${t}！🎉`,
+    bad: '不對不對，重新找！🙅',
+    targetIs: t=>`湊成 ${t}`,
+    canQ: t=>`這兩朵雲，能湊成 ${t} 嗎？`,
+    yes: '可以！', no: '不行！',
+    noGood: (a,b,s,t)=>`答對了！${a} + ${b} = ${s}，湊不成 ${t}！`,
+    timeLeft: s=>`⏰ 還剩 ${s} 秒`,
+    timeUp: '時間到！', yourScore: s=>`你得到 ${s} 分！`,
+    again: '再玩一次', keepGoing: '好厲害！繼續加油！',
+    eqAsk: (a,t)=>`${a} + （ ？ ） = ${t}`,
+    fillHint: '點一朵雲朵，幫問號找好朋友！',
+    bombed: '砰！踩到炸彈雲了，小心！💥',
+    boomSay: '炸彈不能湊，快跳過它！',
+    streak5: '🔥 連對 5 次！你是湊數小達人！',
+    stars3: '★★★', stars2: '★★☆', stars1: '★☆☆'
+  },
+  en: {
+    heroSub: 'Learn to make 8 and 9 with cute little clouds!',
+    tip: 'Chant: look at the target first, then find its friend', tipSub: 'Tap to play on the big screen · chant together for more fun!',
+    back: 'Back',
+    modes: [
+      {icon:'☁️', t:'Make 8', d:'Tap two clouds — do they add up to 8? Chant together: yes yes yes!'},
+      {icon:'🌈', t:'Make 9', d:'New target! Tap two clouds — do they add up to 9?'},
+      {icon:'⚡', t:'Speed Round', d:'60 seconds! Can these two clouds make the target? Hit ⭕ or ❌ now!'},
+      {icon:'🧩', t:'Fill the Blank', d:'2 + ( ? ) = 8 — which cloud is missing? Help it come home!'},
+      {icon:'💣', t:'Bomb Trap', d:'Watch out for bomb clouds! Dodge the bombs and find the pair that makes the target.'}
+    ],
+    pick2: 'Tap two clouds and try!',
+    good: (a,b,t)=>`Yes yes yes! ${a} and ${b} make ${t}! 🎉`,
+    bad: 'Nope nope, try again! 🙅',
+    targetIs: t=>`Make ${t}`,
+    canQ: t=>`Can these two clouds make ${t}?`,
+    yes: 'Yes!', no: 'No!',
+    noGood: (a,b,s,t)=>`Correct! ${a} + ${b} = ${s}, not ${t}!`,
+    timeLeft: s=>`⏰ ${s}s left`,
+    timeUp: "Time's up!", yourScore: s=>`You scored ${s}!`,
+    again: 'Play again', keepGoing: 'Amazing! Keep going!',
+    eqAsk: (a,t)=>`${a} + ( ? ) = ${t}`,
+    fillHint: 'Tap a cloud to help the question mark!',
+    bombed: 'Boom! You hit a bomb cloud, be careful! 💥',
+    boomSay: "Bombs can't pair up — skip it!",
+    streak5: '🔥 5 in a row! You are a number-pair star!',
+    stars3: '★★★', stars2: '★★☆', stars1: '★☆☆'
+  }
+};
+
+/* ================= settings ================= */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem('kumo-mo-'+k); return v===null? d : v; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem('kumo-mo-'+k, v); }catch(e){} }
+};
+const S = {
+  lang: store.get('lang','zh'),
+  theme: store.get('theme','silver'),
+  sound: store.get('sound','1')==='1',
+  mode: null, score: 0, streak: 0, busy: false
+};
+const T = ()=>I18N[S.lang];
+
+/* ================= audio (synthesized, no files) ================= */
+let AC = null;
+function ac(){
+  if(!AC){ try{ AC = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+  if(AC && AC.state==='suspended') AC.resume();
+  return AC;
+}
+function tone(f, d=0.15, type='sine', vol=0.22, when=0){
+  if(!S.sound) return;
+  const c = ac(); if(!c) return;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type; o.frequency.value = f;
+  const t0 = c.currentTime + when;
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(vol, t0+0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0+d);
+  o.connect(g); g.connect(c.destination);
+  o.start(t0); o.stop(t0+d+0.05);
+}
+const sfx = {
+  pop(){ tone(520,0.09,'triangle',0.25); tone(780,0.08,'triangle',0.18,0.05); },
+  good(){ [523,659,784,1047].forEach((f,i)=>tone(f,0.16,'triangle',0.24,i*0.09)); },
+  bad(){ tone(220,0.22,'sawtooth',0.12); tone(175,0.28,'sawtooth',0.12,0.12); },
+  boom(){ tone(90,0.5,'square',0.3); tone(60,0.6,'sawtooth',0.25,0.05); },
+  tick(){ tone(880,0.06,'square',0.08); },
+  win(){ [523,659,784,1047,1319].forEach((f,i)=>tone(f,0.2,'triangle',0.24,i*0.11)); },
+  flip(){ tone(660,0.07,'sine',0.15); }
+};
+
+/* ================= helpers ================= */
+const $ = id=>document.getElementById(id);
+const rnd = n=>Math.floor(Math.random()*n);
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=rnd(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function say(txt, mood){
+  $('sayTxt').textContent = txt;
+  const b = $('sayBox');
+  b.classList.remove('good','bad');
+  if(mood) b.classList.add(mood);
+}
+function setScore(v){ S.score=v; $('scoreV').textContent=v; }
+function setStreak(v){ S.streak=v; $('streakV').textContent=v; }
+function sparkles(x,y,n=10){
+  const em=['✦','✧','❀','♡','⋆'];
+  for(let i=0;i<n;i++){
+    const s=document.createElement('div');
+    s.className='spark'; s.textContent=em[rnd(em.length)];
+    s.style.left=x+'px'; s.style.top=y+'px';
+    s.style.setProperty('--sx',(rnd(160)-80)+'px');
+    s.style.setProperty('--sy',(rnd(160)-80)+'px');
+    s.style.color=['#FF8FB2','#FFC93C','#7FC8F8','#B49DF2'][rnd(4)];
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),950);
+  }
+}
+function burstAt(el){
+  const r=el.getBoundingClientRect();
+  sparkles(r.left+r.width/2, r.top+r.height/2, 12);
+}
+function cloudHTML(n, extra=''){
+  return `<button class="cloud ${extra}" data-n="${n}" style="--d:${(2.6+Math.random()*2).toFixed(2)}s">
+    <span class="fuse"></span>
+    <span class="kface"><i></i><i></i><span class="blush l"></span><span class="blush r"></span><u></u></span>
+    <span class="num">${n}</span></button>`;
+}
+function lock(ms){ S.busy=true; setTimeout(()=>S.busy=false, ms); }
+
+/* ================= apply settings ================= */
+function applySettings(){
+  document.body.dataset.theme = S.theme;
+  document.querySelectorAll('#themeBtn .dots i').forEach(i=>i.classList.toggle('on', i.dataset.t===S.theme));
+  $('soundBtn').textContent = S.sound? '🔊':'🔇';
+  $('langBtn').querySelector('span').textContent = S.lang==='zh'?'繁中':'EN';
+  document.documentElement.lang = S.lang==='zh'?'zh-Hant':'en';
+  renderHome();
+  if(S.mode){ enterMode(S.mode, true); }
+}
+
+/* ================= home ================= */
+function renderHome(){
+  const t=T();
+  $('heroSub').textContent=t.heroSub;
+  $('tipText').textContent=t.tip; $('tipSub').textContent=t.tipSub;
+  $('backTxt').textContent=t.back;
+  $('modeList').innerHTML = t.modes.map((m,i)=>`
+    <button class="mode" data-mode="${['pair8','pair9','speed','fill','bomb'][i]}">
+      <span class="ic">${m.icon}</span>
+      <span><span class="t">${m.t}</span><br><span class="d">${m.d}</span></span>
+      <span class="go">▶</span>
+    </button>`).join('');
+  document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>{ sfx.flip(); enterMode(b.dataset.mode); }));
+}
+
+/* ================= mode shell ================= */
+const MODES=['pair8','pair9','speed','fill','bomb'];
+function enterMode(mode, keepScore){
+  S.mode=mode; S.busy=false;
+  $('home').style.display='none'; $('stage').style.display='block';
+  if(!keepScore){ setScore(0); setStreak(0); }
+  $('bombTarget').style.display = mode==='bomb' ? 'flex' : 'none';
+  $('ovl').classList.remove('show');
+  ({pair8:()=>startPair(8), pair9:()=>startPair(9), speed:startSpeed, fill:startFill, bomb:startBomb})[mode]();
+  window.scrollTo(0,0);
+}
+function goHome(){
+  S.mode=null; stopSpeed();
+  $('stage').style.display='none'; $('home').style.display='block';
+  $('ovl').classList.remove('show');
+  renderHome(); window.scrollTo(0,0);
+}
+
+/* ================= mode 1 & 2 : pair ================= */
+let pairTarget=8, sel=[];
+function pairNums(t){ return t===8 ? shuffle([1,2,3,4,4,5,6,7]) : shuffle([1,2,3,4,5,6,7,8]); }
+function startPair(t){
+  pairTarget=t; sel=[];
+  $('targetBanner').textContent=T().targetIs(t);
+  say(T().pick2);
+  renderClouds(pairNums(t), false);
+}
+function renderClouds(nums, withBombs){
+  const area=$('gameArea');
+  area.innerHTML=`<div class="field" id="field"></div>`;
+  const f=$('field');
+  let items=nums.map(n=>({n, bomb:false}));
+  if(withBombs){ for(let i=0;i<3;i++) items.push({n:0, bomb:true}); }
+  shuffle(items).forEach(it=>{
+    const tmp=document.createElement('div');
+    tmp.innerHTML = it.bomb
+      ? `<button class="cloud bomb" data-bomb="1" style="--d:${(2.6+Math.random()*2).toFixed(2)}s">
+           <span class="fuse"></span>
+           <span class="kface"><i></i><i></i><u></u></span>
+           <span class="num">💣</span></button>`
+      : cloudHTML(it.n);
+    f.appendChild(tmp.firstChild);
+  });
+  f.querySelectorAll('.cloud').forEach(c=>c.addEventListener('click',()=>onCloudTap(c)));
+}
+function onCloudTap(c){
+  if(S.busy) return;
+  ac();
+  if(c.dataset.bomb){ onBomb(c); return; }
+  if(c.classList.contains('sel')){ c.classList.remove('sel'); sel=sel.filter(x=>x!==c); return; }
+  if(sel.length>=2) return;
+  sfx.pop();
+  c.classList.add('sel'); sel.push(c);
+  if(sel.length===2) setTimeout(checkPair, 380);
+}
+function checkPair(){
+  if(sel.length<2) return;   // user deselected during the delay
+  const [c1,c2]=sel; sel=[];
+  const a=+c1.dataset.n, b=+c2.dataset.n, t=pairTarget;
+  lock(950);
+  if(a+b===t){
+    c1.classList.add('good'); c2.classList.add('good');
+    c1.classList.remove('sel'); c2.classList.remove('sel');
+    sfx.good(); burstAt(c1); burstAt(c2);
+    say(T().good(a,b,t),'good');
+    setScore(S.score+1); setStreak(S.streak+1);
+    if(S.streak>0 && S.streak%5===0){ setTimeout(()=>{ say(T().streak5,'good'); sfx.win(); }, 1000); }
+    setTimeout(()=>{
+      c1.classList.remove('good'); c2.classList.remove('good');
+      if(S.mode==='bomb') renderClouds(pairNums(t), true); // reshuffle after success
+    }, 900);
+  }else{
+    c1.classList.add('bad'); c2.classList.add('bad');
+    sfx.bad(); say(T().bad,'bad'); setStreak(0);
+    setTimeout(()=>{ c1.classList.remove('bad','sel'); c2.classList.remove('bad','sel'); }, 850);
+  }
+}
+
+/* ================= mode 5 : bomb ================= */
+function startBomb(){
+  pairTarget = +($('bombTarget').querySelector('.on')?.dataset.tg || 8);
+  $('targetBanner').textContent=T().targetIs(pairTarget);
+  sel=[];
+  say(T().pick2);
+  renderClouds(pairNums(pairTarget), true);
+}
+function onBomb(c){
+  lock(900);
+  sfx.boom();
+  c.classList.add('boomed');
+  document.body.classList.add('shake-screen');
+  setTimeout(()=>document.body.classList.remove('shake-screen'), 550);
+  say(T().bombed,'bad');
+  setScore(Math.max(0,S.score-1)); setStreak(0);
+  const r=c.getBoundingClientRect();
+  sparkles(r.left+r.width/2, r.top, 8);
+  setTimeout(()=>c.classList.remove('boomed'), 900);
+}
+document.querySelectorAll('#bombTarget button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#bombTarget button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); sfx.flip();
+  if(S.mode==='bomb') startBomb();
+}));
+
+/* ================= mode 3 : speed ================= */
+let speedTimer=null, speedLeft=0, speedTarget=8, speedA=0, speedB=0;
+function stopSpeed(){ if(speedTimer){ clearInterval(speedTimer); speedTimer=null; } }
+function startSpeed(){
+  stopSpeed();
+  speedLeft=60; setScore(0); setStreak(0);
+  speedRound();
+  updateTbar();
+  speedTimer=setInterval(()=>{
+    speedLeft--;
+    if(speedLeft<=10 && speedLeft>0) sfx.tick();
+    updateTbar();
+    if(speedLeft<=0){ stopSpeed(); speedOver(); }
+  },1000);
+}
+function updateTbar(){
+  const pct=Math.max(0,speedLeft/60*100);
+  const bar=$('tbarFill'); if(bar) bar.style.width=pct+'%';
+  const lb=$('tLabel'); if(lb) lb.textContent=T().timeLeft(speedLeft);
+}
+function speedRound(){
+  speedTarget = Math.random()<0.5?8:9;
+  speedA = 1+rnd(8); speedB = 1+rnd(8);
+  $('targetBanner').textContent=T().targetIs(speedTarget);
+  say(T().canQ(speedTarget));
+  $('gameArea').innerHTML=`
+    <div class="bigpair">
+      <div class="cloud" style="--d:2.4s"><span class="kface"><i></i><i></i><span class="blush l"></span><span class="blush r"></span><u></u></span><span class="num">${speedA}</span></div>
+      <div class="cloud" style="--d:3s"><span class="kface"><i></i><i></i><span class="blush l"></span><span class="blush r"></span><u></u></span><span class="num">${speedB}</span></div>
+    </div>
+    <div class="tbar"><i id="tbarFill"></i></div>
+    <div class="tlabel" id="tLabel"></div>
+    <div class="oxrow">
+      <button class="obtn yes" data-ok="1">⭕</button>
+      <button class="obtn no" data-ok="0">❌</button>
+    </div>`;
+  updateTbar();
+  $('gameArea').querySelectorAll('.obtn').forEach(b=>b.addEventListener('click',()=>{
+    ac();
+    const can = (speedA+speedB)===speedTarget;
+    const ok = (b.dataset.ok==='1')===can;
+    if(ok){
+      sfx.good(); setScore(S.score+1); setStreak(S.streak+1);
+      say(can ? T().good(speedA,speedB,speedTarget) : T().noGood(speedA,speedB,speedA+speedB,speedTarget), 'good');
+      const r=b.getBoundingClientRect(); sparkles(r.left+50,r.top+50,8);
+    }else{
+      sfx.bad(); setStreak(0);
+      say(T().bad,'bad');
+      lock(500);
+    }
+    setTimeout(()=>{ if(S.mode==='speed'&&speedLeft>0) speedRound(); }, ok?650:800);
+  }));
+}
+function speedOver(){
+  sfx.win();
+  const t=T(), s=S.score;
+  const stars = s>=18? t.stars3 : s>=10? t.stars2 : t.stars1;
+  showOverlay(`
+    <h2>${t.timeUp}</h2>
+    <div class="stars">${stars}</div>
+    <p>${t.yourScore(s)}<br>${t.keepGoing}</p>
+    <button class="btn" id="againBtn">${t.again}</button>`);
+  $('againBtn').addEventListener('click',()=>{ $('ovl').classList.remove('show'); sfx.flip(); startSpeed(); });
+}
+
+/* ================= mode 4 : fill the blank ================= */
+function startFill(){
+  const t = Math.random()<0.5?8:9;
+  const a = 1+rnd(t-1);           // 1..t-1  => answer b = t-a is 1..t-1
+  const b = t-a;
+  $('targetBanner').textContent=T().targetIs(t);
+  say(T().fillHint);
+  $('gameArea').innerHTML=`
+    <div class="eq">${a} + <span class="blank">？</span> = ${t}</div>
+    <div class="field" id="field"></div>`;
+  const f=$('field');
+  shuffle([1,2,3,4,5,6,7,8]).forEach(n=>{
+    const tmp=document.createElement('div'); tmp.innerHTML=cloudHTML(n);
+    const c=tmp.firstChild;
+    c.addEventListener('click',()=>{
+      if(S.busy) return; ac();
+      if(+c.dataset.n===b){
+        lock(900); sfx.good(); c.classList.add('good'); burstAt(c);
+        say(T().good(a,b,t),'good');
+        setScore(S.score+1); setStreak(S.streak+1);
+        document.querySelector('.eq .blank').textContent=b;
+        setTimeout(startFill, 1400);
+      }else{
+        lock(700); sfx.bad(); c.classList.add('bad'); say(T().bad,'bad'); setStreak(0);
+        setTimeout(()=>c.classList.remove('bad'), 650);
+      }
+    });
+    f.appendChild(c);
+  });
+}
+
+/* ================= overlay ================= */
+function showOverlay(html){
+  $('ovlCard').innerHTML=html;
+  $('ovl').classList.add('show');
+}
+
+/* ================= wiring ================= */
+$('backBtn').addEventListener('click',()=>{ sfx.flip(); goHome(); });
+$('langBtn').addEventListener('click',()=>{ S.lang=S.lang==='zh'?'en':'zh'; store.set('lang',S.lang); sfx.flip(); applySettings(); });
+$('themeBtn').addEventListener('click',()=>{
+  S.theme = S.theme==='white'?'silver': S.theme==='silver'?'black':'white';
+  store.set('theme',S.theme); sfx.flip(); applySettings();
+});
+$('soundBtn').addEventListener('click',()=>{ S.sound=!S.sound; store.set('sound',S.sound?'1':'0'); applySettings(); if(S.sound) sfx.pop(); });
+$('ovl').addEventListener('click',e=>{ if(e.target===$('ovl')) $('ovl').classList.remove('show'); });
+
+/* background mini clouds */
+(function(){
+  for(let i=0;i<5;i++){
+    const c=document.createElement('div');
+    c.className='minicloud';
+    const w=60+rnd(70);
+    c.style.width=w+'px'; c.style.height=(w*0.55)+'px';
+    c.style.top=(8+rnd(70))+'vh';
+    c.style.animationDuration=(26+rnd(30))+'s';
+    c.style.animationDelay=(-rnd(40))+'s';
+    document.body.appendChild(c);
+  }
+})();
+
+applySettings();
+</script>
+</body>
+</html>
